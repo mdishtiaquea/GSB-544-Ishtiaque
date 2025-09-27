@@ -6,12 +6,13 @@ __pycache__/
 .Rhistory
 .Rproj.user/
 .env
-.venv
+.venv/
 */_site/
 */_freeze/
 *.pdf
 *.html
 !pa1_2_mtcars.html
+!pa1_2_mtcars_files/**
 
 /.quarto/
 **/*.quarto_ipynb
