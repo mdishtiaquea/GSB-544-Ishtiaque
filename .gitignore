@@ -1,0 +1,17 @@
+
+__pycache__/
+.ipynb_checkpoints/
+*.log
+*.DS_Store
+.Rhistory
+.Rproj.user/
+.env
+.venv
+*/_site/
+*/_freeze/
+*.pdf
+*.html
+!pa1_2_mtcars.html
+
+/.quarto/
+**/*.quarto_ipynb
