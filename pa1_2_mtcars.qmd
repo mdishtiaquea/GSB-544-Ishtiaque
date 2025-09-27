@@ -1,0 +1,133 @@
+title: "Practice Activity 1.2 — Decode a Message & Visualize mtcars"
+author: "Md. Ishtiaque Alam"
+format: html
+
+```{python}
+import pandas as pd
+import numpy as np
+from pydataset import data
+from plotnine import (
+    ggplot, aes, geom_boxplot, geom_histogram, position_identity,
+    geom_point, geom_smooth, geom_violin, geom_segment, coord_flip,
+    labs, theme_bw, theme, element_text
+)
+
+df = data('mtcars').reset_index().rename(columns={'index':'name'})
+df.head()
+```
+
+
+```{python}
+df["am"] = df["am"].astype(str)
+for c in ["cyl", "vs", "gear", "carb"]:
+    df[c] = df[c].astype(str)
+
+df.dtypes
+```
+
+**Answer (How to tell they converted)**
+- They show up as `object` in `df.dtypes`
+- Printing a few rows shows quotes around the values ("0", "1", "4"...)
+- Plots treat them like categories (separate groups/labels)
+
+```{python}
+p_box_cat = (
+    ggplot(df, aes(x="am", y="mpg"))
+    + geom_boxplot()
+    + theme_bw()
+    + labs(title="MPG by Transmission (am as text)",
+           x="Transmission (0=automatic, 1=manual)", y="MPG")
+)
+p_box_cat
+```
+
+```{python}
+df_am_float = df.copy()
+df_am_float["am"] = df_am_float["am"].astype(float)
+
+p_box_float = (
+    ggplot(df_am_float, aes(x="am", y="mpg"))
+    + geom_boxplot()
+    + theme_bw()
+    + labs(title="MPG by Transmission (am as float)",
+           x="am (numeric)", y="MPG")
+)
+p_box_float
+```
+
+**Answer (Boxplots of mpg by am — differences)**
+- With `am` as text: two clear boxes (0 vs 1)
+- With `am` as float: x-axis is numeric and the grouping looks weird
+- Boxplots work better when `am` is text
+
+```{python}
+p_hist_cat = (
+    ggplot(df, aes(x="hp", fill="cyl"))
+    + geom_histogram(position=position_identity(), alpha=0.5, bins=15)
+    + theme_bw()
+    + labs(title="HP distributions by # Cylinders (cyl as text)",
+           x="Gross horsepower (hp)", y="Count")
+)
+p_hist_cat
+```
+
+```{python}
+df_cyl_float = df.copy()
+df_cyl_float["cyl"] = df_cyl_float["cyl"].astype(float)
+
+p_hist_float = (
+    ggplot(df_cyl_float, aes(x="hp", fill="cyl"))
+    + geom_histogram(position=position_identity(), alpha=0.5, bins=15)
+    + theme_bw()
+    + labs(title="HP distributions by # Cylinders (cyl as float)",
+           x="Gross horsepower (hp)", y="Count")
+)
+p_hist_float
+```
+
+**Answer (Histograms of hp by cyl — differences)**
+- With `cyl` as text: nice overlays for 4/6/8 with a simple legend
+- With `cyl` as float: the fill turns into a gradient and it is confusing
+- So `cyl` as text is easier to read
+
+```{python}
+p_scatter = (
+    ggplot(df, aes(x="wt", y="mpg"))
+    + geom_point()
+    + geom_smooth(method="lm", se=True)
+    + theme_bw()
+    + labs(title="MPG vs Weight with Linear Trend",
+           x="Weight (1000 lbs)", y="MPG")
+)
+p_scatter
+```
+
+```{python}
+p_violin = (
+    ggplot(df, aes(x="cyl", y="mpg"))
+    + geom_violin()
+    + theme_bw()
+    + labs(title="MPG Distribution by Cylinder Count (Violin)",
+           x="# Cylinders", y="MPG")
+)
+p_violin
+```
+
+```{python}
+df_lollipop = df.sort_values("mpg", ascending=False).head(10).copy()
+p_lollipop = (
+    ggplot(df_lollipop, aes(x="name", y="mpg"))
+    + geom_segment(aes(x="name", xend="name", y=0, yend="mpg"))
+    + geom_point(size=2.5)
+    + coord_flip()
+    + theme_bw()
+    + labs(title="Top 10 Cars by MPG (Lollipop)",
+           x="Car", y="MPG")
+    + theme(axis_text_y=element_text(ha="right"))
+)
+p_lollipop
+```
+
+**Reflection**
+- Even though `am`, `cyl`, etc. look like numbers, they are basically codes (few fixed options)
+- There is no "in-between," so it is better to treat them as categories for plotting and summaries
