@@ -17,3 +17,5 @@ __pycache__/
 /.quarto/
 **/*.quarto_ipynb
 out/
+
+!lab1_gapminder/**

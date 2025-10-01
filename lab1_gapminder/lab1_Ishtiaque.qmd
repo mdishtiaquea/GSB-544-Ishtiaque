@@ -1,0 +1,82 @@
+---
+title: "Lab 1 — Gapminder"
+format: html
+---
+
+```{python}
+import pandas as pd
+from plotnine import ggplot, aes, geom_point, geom_smooth, geom_bin2d, scale_x_log10, scale_y_log10
+q1 = pd.read_csv("q1data.csv")
+q2 = pd.read_csv("q2data.csv")
+q3 = pd.read_csv("q3data.csv")
+```
+
+# Task 1
+
+**Aesthetics used (what maps to what):**  
+- x = internet_users  
+- y = gdp  
+- color = four_regions  
+- size = income
+
+```{python}
+t1 = q3[q3["year"] == 2001]
+p1 = ggplot(t1, aes("internet_users","gdp", color="four_regions", size="income")) + geom_point() + scale_y_log10()
+p1
+```
+
+**Another geometry (quick note):**  
+- `geom_smooth`: **good** to show overall trend; **bad** because it hides country-level dots.
+
+```{python}
+p1_alt = ggplot(t1, aes("internet_users","gdp")) + geom_smooth() + scale_y_log10()
+p1_alt
+```
+
+# Task 2
+
+**Aesthetics used:**  
+- x = exports  
+- y = imports  
+- color = four_regions  
+- size = energy
+
+```{python}
+t2 = q2.query("year == 1997").copy()
+for c in ["exports", "imports", "energy"]:
+    t2[c] = pd.to_numeric(t2[c], errors="coerce")
+t2 = t2.dropna(subset=["exports", "imports", "energy", "four_regions"])
+print("t2 rows after cleaning:", len(t2))
+p2 = ggplot(t2, aes("exports","imports", color="four_regions", size="energy")) + geom_point()
+p2
+```
+
+**Another geometry (quick note):**  
+- `geom_bin2d`: **good** for where many points pile up; **bad** because you lose per-country bubbles.
+
+```{python}
+p2_alt = ggplot(t2, aes("exports","imports")) + geom_bin2d()
+p2_alt
+```
+
+# Task 3
+
+**Aesthetics used:**  
+- x = income (log)  
+- y = life_exp  
+- color = four_regions  
+- size = population
+
+```{python}
+t3 = q1[q1["year"] == 2010]
+p3 = ggplot(t3, aes("income","life_exp", color="four_regions", size="population")) + geom_point() + scale_x_log10()
+p3
+```
+
+**Another geometry (quick note):**  
+- `geom_smooth`: **good** for the rising curve; **bad** since outliers/countries get hidden.
+
+```{python}
+p3_alt = ggplot(t3, aes("income","life_exp")) + geom_smooth() + scale_x_log10()
+p3_alt
+```
